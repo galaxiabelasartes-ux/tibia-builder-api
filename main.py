@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 import asyncpg
 import os
+import json
 
 app = FastAPI()
 
@@ -20,10 +21,16 @@ async def create_monster(monster: Monster):
         VALUES ($1, $2, $3, $4)
         RETURNING id, name, hp, level, attributes;
     """
-    row = await conn.fetchrow(query, monster.name, monster.hp, monster.level, monster.attributes)
+    row = await conn.fetchrow(
+        query,
+        monster.name,
+        monster.hp,
+        monster.level,
+        json.dumps(monster.attributes)  # garante formato JSON
+    )
     await conn.close()
     return dict(row)
-
+    
 @app.get("/")
 async def root():
     return {"message": "Tibia Builder API Online!"}
