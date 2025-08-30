@@ -1,0 +1,29 @@
+name: Atualizar dados do Tibia
+
+on:
+  schedule:
+    - cron: "0 3 * * *"  # Roda todo dia às 03:00 UTC
+  workflow_dispatch:      # Permite rodar manualmente pelo GitHub
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clonar repositório
+        uses: actions/checkout@v3
+
+      - name: Configurar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Instalar dependências
+        run: |
+          pip install requests beautifulsoup4 asyncpg
+
+      - name: Rodar script de atualização
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          API_TOKEN: ${{ secrets.API_TOKEN }}
+        run: |
+          python scripts/update_data.py
