@@ -14,9 +14,9 @@ class Monster(BaseModel):
     level: int
     attributes: Dict[str, str | int]
 
-# Autenticação simples via token de API
+# Autenticação via token
 def verify_token(authorization: Optional[str] = Header(None)):
-    API_TOKEN = os.getenv("API_TOKEN")  # Defina no Render
+    API_TOKEN = os.getenv("API_TOKEN")
     if not API_TOKEN:
         raise HTTPException(status_code=500, detail="API_TOKEN não configurado no servidor")
     if authorization != f"Bearer {API_TOKEN}":
@@ -25,15 +25,14 @@ def verify_token(authorization: Optional[str] = Header(None)):
 @app.post("/monsters")
 async def create_monster(monster: Monster, auth: None = Depends(verify_token)):
     try:
-        # Conexão segura com SSL
         ssl_context = ssl.create_default_context()
         conn = await asyncpg.connect(
             os.getenv("DATABASE_URL"),
-            ssl=ssl.create_default_context()
+            ssl=ssl_context
         )
+
+        # Passa o token para o banco como variável de sessão
         await conn.execute("SET my.api_token = $1", os.getenv("API_TOKEN"))
-
-
 
         query = """
             INSERT INTO monsters (name, hp, level, attributes)
