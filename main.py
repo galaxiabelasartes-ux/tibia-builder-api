@@ -16,7 +16,7 @@ class Creature(BaseModel):
 async def create_creature(creature: Creature):
     conn = await asyncpg.connect(os.getenv("DATABASE_URL"))
     query = """
-        INSERT INTO creatures (name, hp, level, attributes)
+        INSERT INTO monsters (name, hp, level, attributes)
         VALUES ($1, $2, $3, $4)
         RETURNING id, name, hp, level, attributes;
     """
