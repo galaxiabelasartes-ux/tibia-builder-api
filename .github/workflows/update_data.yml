@@ -1,5 +1,13 @@
 name: Atualizar dados do Tibia
 
+- name: Debug DATABASE_URL
+  run: |
+    echo "${DATABASE_URL}" | sed 's/\(postgresql:\/\/[^:]*:\)[^@]*/\1*****@/'
+  env:
+    DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+
+
 on:
   schedule:
     - cron: "0 3 * * *"  # Roda todo dia às 03:00 UTC
