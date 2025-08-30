@@ -29,8 +29,11 @@ async def create_monster(monster: Monster, auth: None = Depends(verify_token)):
         ssl_context = ssl.create_default_context()
         conn = await asyncpg.connect(
             os.getenv("DATABASE_URL"),
-            ssl=ssl_context
+            ssl=ssl.create_default_context()
         )
+        await conn.execute("SET my.api_token = $1", os.getenv("API_TOKEN"))
+
+
 
         query = """
             INSERT INTO monsters (name, hp, level, attributes)
