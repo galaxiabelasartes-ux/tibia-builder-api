@@ -9,7 +9,8 @@ app = FastAPI(
 
 # Inclui apenas os módulos
 app.include_router(users.router)
-app.include_route(items.router)
+app.include_router(items.router)
+app.include_router(monsters.router)
 
 @app.get("/")
 def root():
