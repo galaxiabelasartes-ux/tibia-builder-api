@@ -1,17 +1,8 @@
 from fastapi import APIRouter, HTTPException
-import os
-import requests
+from core.database import supabase_get
 
 router = APIRouter(prefix="/items", tags=["items"])
 
-# Configurações Supabase
-SUPABASE_URL = os.getenv("SUPABASE_URL")
-SUPABASE_KEY = os.getenv("SUPABASE_KEY")
-headers = {"apikey": SUPABASE_KEY, "Authorization": f"Bearer {SUPABASE_KEY}"}
-
-# =========================
-# GET ITEMS
-# =========================
 @router.get("/")
 def get_items(
     slot: int | None = None,
@@ -19,15 +10,12 @@ def get_items(
     min_level: int | None = None
 ):
     """
-    Retorna a lista de itens.
-    Filtros opcionais:
-    - slot (int): filtra por slot (1 = head, 2 = armor, etc.)
-    - vocation (str): filtra por vocação (Knight, Paladin, Druid, Sorcerer)
+    Retorna a lista de itens com filtros opcionais:
+    - slot (int): filtra por slot (1=head, 2=armor, etc.)
+    - vocation (str): Knight, Paladin, Druid, Sorcerer
     - min_level (int): nível mínimo requerido
     """
-    url = f"{SUPABASE_URL}/rest/v1/items"
     params = {}
-
     if slot is not None:
         params["slot"] = f"eq.{slot}"
     if vocation is not None:
@@ -35,7 +23,7 @@ def get_items(
     if min_level is not None:
         params["level_required"] = f"gte.{min_level}"
 
-    resp = requests.get(url, headers=headers, params=params)
+    resp = supabase_get("items", params)
     if resp.status_code != 200:
         raise HTTPException(status_code=resp.status_code, detail="Erro ao buscar itens")
 
