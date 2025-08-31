@@ -113,6 +113,53 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
     return resp.json()[0]
 
 # =========================
+# UPDATE USER (PATCH)
+# =========================
+@app.patch("/users/me")
+def update_user_me(
+    username: str | None = None,
+    email: str | None = None,
+    password: str | None = None,
+    current_user: dict = Depends(get_current_user)
+):
+    update_data = {}
+    if username:
+        update_data["username"] = username
+    if email:
+        update_data["email"] = email
+    if password:
+        update_data["password_hash"] = get_password_hash(password)
+
+    if not update_data:
+        raise HTTPException(status_code=400, detail="Nenhum campo para atualizar")
+
+    resp = requests.patch(
+        f"{SUPABASE_URL}/rest/v1/users?id=eq.{current_user['id']}",
+        headers={**headers, "Content-Type": "application/json"},
+        json=update_data,
+    )
+
+    if resp.status_code not in (200, 204):
+        raise HTTPException(status_code=500, detail="Erro ao atualizar usuário")
+
+    return {"msg": "Usuário atualizado com sucesso!"}
+
+# =========================
+# DELETE USER
+# =========================
+@app.delete("/users/me")
+def delete_user_me(current_user: dict = Depends(get_current_user)):
+    resp = requests.delete(
+        f"{SUPABASE_URL}/rest/v1/users?id=eq.{current_user['id']}",
+        headers=headers,
+    )
+
+    if resp.status_code not in (200, 204):
+        raise HTTPException(status_code=500, detail="Erro ao deletar usuário")
+
+    return {"msg": "Usuário deletado com sucesso!"}
+
+# =========================
 # ENDPOINT PROTEGIDO
 # =========================
 @app.get("/me")
