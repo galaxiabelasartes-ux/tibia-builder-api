@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from routers import users, items, monsters, gems, imbuements
+from routers import users, items, monsters, gems, imbuements, builds
 
 app = FastAPI(
     title="Tibia Builder API",
