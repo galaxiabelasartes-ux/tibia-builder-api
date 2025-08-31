@@ -1,5 +1,6 @@
 fastapi
 uvicorn
 supabase
-asyncpg
 requests
+passlib[bcrypt]
+python-jose[cryptography]
