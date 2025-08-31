@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from routers import users
+from routers import users, items, monsters, gems, imbuements
 
 app = FastAPI(
     title="Tibia Builder API",
@@ -7,10 +7,12 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Inclui apenas os módulos
+# Inclui os routers
 app.include_router(users.router)
 app.include_router(items.router)
 app.include_router(monsters.router)
+app.include_router(gems.router)
+app.include_router(imbuements.router)
 
 @app.get("/")
 def root():
