@@ -34,3 +34,14 @@ jobs:
           API_TOKEN: ${{ secrets.API_TOKEN }}
         run: |
           python scripts/update_data.py
+
+      - name: Testar conexão com o banco (pg_isready)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+          echo "Testando conexão com o Supabase..."
+          PGPASSWORD=$(echo $DATABASE_URL | sed 's/.*:.*:\(.*\)@.*/\1/') \
+          psql "$DATABASE_URL" -c '\conninfo'
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
