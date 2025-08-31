@@ -59,7 +59,7 @@ def register(username: str, email: str, password: str):
         json=user
     )
     if resp.status_code not in (200, 201):
-        raise HTTPException(status_code=500, detail="Erro ao registrar usuário")
+        raise HTTPException(status_code=resp.status_code, detail=resp.text)
     return {"msg": "Usuário registrado com sucesso!"}
 
 # =========================
