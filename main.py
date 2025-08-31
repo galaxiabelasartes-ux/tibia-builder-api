@@ -7,13 +7,14 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Inclui os routers
+# Inclui os routers (cada um em seu arquivo)
 app.include_router(users.router)
 app.include_router(items.router)
 app.include_router(monsters.router)
 app.include_router(gems.router)
 app.include_router(imbuements.router)
 
+# Rota raiz
 @app.get("/")
 def root():
     return {"message": "Tibia Builder API Online!"}
