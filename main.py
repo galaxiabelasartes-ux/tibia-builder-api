@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, status, HTTPException, Depends
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from passlib.context import CryptContext
 from jose import JWTError, jwt
@@ -76,6 +76,41 @@ def login(form_data: OAuth2PasswordRequestForm = Depends()):
 @app.get("/")
 def root():
     return {"message": "Tibia Builder API Online!"}
+
+from jose import JWTError, jwt
+from fastapi import status
+
+# Função auxiliar para pegar usuário atual
+def get_current_user(token: str = Depends(oauth2_scheme)):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Não foi possível validar as credenciais",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        email: str = payload.get("sub")
+        if email is None:
+            raise credentials_exception
+    except JWTError:
+        raise credentials_exception
+
+    # Busca usuário pelo email no Supabase
+    resp = requests.get(
+        f"{SUPABASE_URL}/rest/v1/user?email=eq.{email}",
+        headers=headers
+    )
+    if resp.status_code != 200 or not resp.json():
+        raise credentials_exception
+
+    return resp.json()[0]
+
+# =========================
+# ENDPOINT PROTEGIDO
+# =========================
+@app.get("/me")
+def read_users_me(current_user: dict = Depends(get_current_user)):
+    return {"user": current_user}
 
 # =========================
 # ITEMS
